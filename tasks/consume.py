@@ -2,6 +2,9 @@ import datetime
 import json
 import logging
 import requests
+from typing import Optional
+from minio import Minio
+import io
 from garminconnect import (
     Garmin,
     GarminConnectAuthenticationError,
@@ -122,8 +125,23 @@ def prepare_json(data1:dict, data2:dict) -> dict:
     logger.info(format_json(concat))
     return concat
 
-def save_json(data: dict, date: datetime.datetime) -> None:
-    filename = f"{date.isoformat()}_data.json"
-    with open(filename, 'w') as f:
-        json.dump(data, f, separators=(',',':'))
-    logger.info(f"Saved data to {filename}")
+def save_json(data: dict, date: datetime.datetime, con:Optional[Minio], bucket:str="") -> None:
+    data = json.dumps(data, separators=(',', ':'))
+    if con is None:
+        filename = f"{date.isoformat()}_overview.json"
+        with open(filename, 'w') as f:
+            json.dump(data, f, separators=(',',':'))
+        logger.info(f"Saved data to {filename}")
+    else:
+        try:
+            path = f"/garmin/{date}/overview.json"
+            con.put_object(
+                bucket,
+                path,
+                io.BytesIO(bytes(data, 'utf-8')),
+                len(data),
+                content_type='application/json'
+            )
+            logger.info(f"Saved data in Minio as {bucket}:{path}")
+        except:
+            logger.error(f"Error saving to Minio")

@@ -3,6 +3,7 @@ charset-normalizer==3.1.0
 cloudscraper==1.2.69
 garminconnect==0.1.55
 idna==3.4
+minio==7.1.14
 pyparsing==3.0.9
 python-dotenv==1.0.0
 requests==2.28.2
