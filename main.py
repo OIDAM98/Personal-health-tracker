@@ -9,6 +9,8 @@ from tasks.consume import (
     , get_daily_activities
     , transform_overview_stats
     , transform_daily_activities
+    , get_sleep_stats
+    , transform_sleep_stats
     , prepare_json
     , save_json
 )
@@ -29,7 +31,10 @@ if __name__=='__main__':
     minio_secret_key = os.getenv('MINIO_SECRET_KEY')
     bucket = os.getenv('BUCKET_NAME')
 
+<<<<<<< HEAD
     # date_query = datetime.date.today()
+=======
+>>>>>>> sleep-information
     date_query = datetime.date.today() - datetime.timedelta(days=1)
     logger.info(f"Getting data for: {date_query.isoformat()}")
     try:
@@ -42,11 +47,21 @@ if __name__=='__main__':
         api = init_api(email, password)
         overview = transform_overview_stats(get_overview_stats(api, date_query))
         activities = transform_daily_activities(get_daily_activities(api, date_query))
+<<<<<<< HEAD
         data = prepare_json(overview, activities)
+=======
+        sleep = transform_sleep_stats(get_sleep_stats(api, date_query))
+        data = prepare_json(overview, activities, sleep)
+>>>>>>> sleep-information
         save_json(data, date_query, con, bucket)
     except:
         api = init_api(email, password)
         overview = transform_overview_stats(get_overview_stats(api, date_query))
         activities = transform_daily_activities(get_daily_activities(api, date_query))
+<<<<<<< HEAD
         data = prepare_json(overview, activities)
+=======
+        sleep = transform_sleep_stats(get_sleep_stats(api, date_query))
+        data = prepare_json(overview, activities, sleep)
+>>>>>>> sleep-information
         save_json(data, date_query)

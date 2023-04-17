@@ -5,6 +5,11 @@ import requests
 from typing import Optional
 from minio import Minio
 import io
+<<<<<<< HEAD
+=======
+from functools import reduce
+import pytz
+>>>>>>> sleep-information
 from garminconnect import (
     Garmin,
     GarminConnectAuthenticationError,
@@ -52,6 +57,11 @@ def init_api(email: str,password: str) -> Garmin:
 
 def get_overview_stats(api: Garmin, date: datetime.datetime) -> dict:
     stats = api.get_stats(date.isoformat())
+    logger.info(format_json(stats))
+    return stats
+
+def get_sleep_stats(api: Garmin, date: datetime.datetime) -> dict:
+    stats = api.get_sleep_data(date.isoformat())
     logger.info(format_json(stats))
     return stats
 
@@ -120,12 +130,95 @@ def transform_daily_activities(data: dict) -> dict:
     logger.info(format_json(stats))
     return stats
 
-def prepare_json(data1:dict, data2:dict) -> dict:
-    concat = dict() | data1 | data2
+def transform_overview_stats(data: dict) -> dict:
+    wanted_stats = [ 'totalKilocalories'
+            ,'activeKilocalories'
+            ,'totalDistanceMeters'
+            ,'dailyStepGoal'
+            ,'activeSeconds'
+            ,'sedentarySeconds'
+            ,'sleepingSeconds'
+            ,'floorsAscendedInMeters'
+            ,'floorsDescendedInMeters'
+            ,'intensityMinutesGoal'
+            ,'minHeartRate'
+            ,'maxHeartRate'
+            ,'restingHeartRate'
+            ,'maxStressLevel'
+            ,'averageStressLevel'
+            ,'totalSteps'
+            ,'sleepingSeconds'
+            ,'stressPercentage'
+            ,'bodyBatteryChargedValue'
+            ,'bodyBatteryDrainedValue'
+            ,'bodyBatteryHighestValue'
+            ,'bodyBatteryLowestValue'
+            ,'stressQualifier'
+        ]
+    stats = {stat: data[stat] for stat in wanted_stats}
+    logger.info(format_json(stats))
+    return stats
+
+def transform_sleep_stats(data: dict) -> dict:
+    unwanted_stats = [
+        'wellnessEpochRespirationDataDTOList'
+        ,'wellnessEpochSPO2DataDTOList'
+        , 'sleepStress'
+        , 'sleepRestlessMoments'
+        , 'sleepLevels'
+        , 'sleepMovement'
+        , 'remSleepData'
+    ]
+    restless_key = 'restlessMomentsCount'
+    sleep_key = 'dailySleepDTO'
+    wanted_sleep_stats = [
+        'sleepTimeSeconds'
+        , 'napTimeSeconds'
+        , 'unmeasurableSleepSeconds'
+        , 'deepSleepSeconds'
+        , 'lightSleepSeconds'
+        , 'remSleepSeconds'
+        , 'awakeSleepSeconds'
+        , 'averageSpO2Value'
+        , 'lowestSpO2Value'
+        , 'highestSpO2Value'
+        , 'averageSpO2HRSleep'
+        , 'averageRespirationValue'
+        , 'lowestRespirationValue'
+        , 'highestRespirationValue'
+        , 'avgSleepStress'
+        , 'ageGroup'
+        , 'sleepScoreFeedback'
+        , 'sleepStartTimestampGMT'
+        , 'sleepEndTimestampGMT'
+    ]
+
+    def timestamp_to_datetime(stamp: str) -> datetime.datetime:
+        dt = (datetime.datetime.utcfromtimestamp(stamp / 1000))
+        return pytz.utc.localize(dt, is_dst=None).astimezone(pytz.timezone('America/Mexico_City'))
+
+    stats = dict([(stat,data[stat]) for stat in data.keys() if stat not in unwanted_stats])
+    wellness_stats = {stat: stats[sleep_key][stat] for stat in wanted_sleep_stats }
+    restless_stats = {restless_key: stats[restless_key]}
+    wellness_stats['sleepStartDatetime'] = str(timestamp_to_datetime(wellness_stats['sleepStartTimestampGMT']))
+    wellness_stats['sleepEndDatetime'] = str(timestamp_to_datetime(wellness_stats['sleepEndTimestampGMT']))
+    del wellness_stats['sleepStartTimestampGMT']
+    del wellness_stats['sleepEndTimestampGMT']
+    sleep_stats = wellness_stats |  restless_stats
+
+    logger.info(format_json(sleep_stats))
+    return sleep_stats
+
+def prepare_json(*data) -> dict:
+    concat = dict(reduce(lambda a,b: a | b, data))
     logger.info(format_json(concat))
     return concat
 
+<<<<<<< HEAD
 def save_json(data: dict, date: datetime.datetime, con:Optional[Minio], bucket:str="") -> None:
+=======
+def save_json(data: dict, date: datetime.datetime, con:Optional[Minio]=None, bucket:str="") -> None:
+>>>>>>> sleep-information
     data = json.dumps(data, separators=(',', ':'))
     if con is None:
         filename = f"{date.isoformat()}_overview.json"
