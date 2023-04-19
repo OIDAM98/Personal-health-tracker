@@ -4,9 +4,13 @@ cloudscraper==1.2.69
 garminconnect==0.1.55
 idna==3.4
 minio==7.1.14
+psycopg2-binary==2.9.6
+pyls==0.1.6
 pyparsing==3.0.9
 python-dotenv==1.0.0
 pytz==2023.3
 requests==2.28.2
 requests-toolbelt==0.10.1
+SQLAlchemy==2.0.9
+typing_extensions==4.5.0
 urllib3==1.26.15

@@ -3,8 +3,10 @@ import logging
 import os
 from dotenv import load_dotenv
 from minio import Minio
+from minio.error import S3Error
 from tasks.consume import (
     init_api
+    , get_full_name
     , get_overview_stats
     , get_daily_activities
     , transform_overview_stats
@@ -31,10 +33,6 @@ if __name__=='__main__':
     minio_secret_key = os.getenv('MINIO_SECRET_KEY')
     bucket = os.getenv('BUCKET_NAME')
 
-<<<<<<< HEAD
-    # date_query = datetime.date.today()
-=======
->>>>>>> sleep-information
     date_query = datetime.date.today() - datetime.timedelta(days=1)
     logger.info(f"Getting data for: {date_query.isoformat()}")
     try:
@@ -45,23 +43,19 @@ if __name__=='__main__':
             secure=False
         )
         api = init_api(email, password)
+        name = get_full_name(api)
         overview = transform_overview_stats(get_overview_stats(api, date_query))
         activities = transform_daily_activities(get_daily_activities(api, date_query))
-<<<<<<< HEAD
-        data = prepare_json(overview, activities)
-=======
         sleep = transform_sleep_stats(get_sleep_stats(api, date_query))
-        data = prepare_json(overview, activities, sleep)
->>>>>>> sleep-information
-        save_json(data, date_query, con, bucket)
-    except:
+        save_json(name, date_query, 'user', con, bucket)
+        save_json(overview, date_query, 'overview', con, bucket)
+        save_json(activities, date_query, 'activities', con, bucket)
+        save_json(sleep, date_query, 'sleep', con, bucket)
+    except S3Error:
         api = init_api(email, password)
         overview = transform_overview_stats(get_overview_stats(api, date_query))
         activities = transform_daily_activities(get_daily_activities(api, date_query))
-<<<<<<< HEAD
-        data = prepare_json(overview, activities)
-=======
         sleep = transform_sleep_stats(get_sleep_stats(api, date_query))
-        data = prepare_json(overview, activities, sleep)
->>>>>>> sleep-information
-        save_json(data, date_query)
+        save_json(overview, date_query, 'overview')
+        save_json(activities, date_query, 'activities')
+        save_json(sleep, date_query, 'sleep')

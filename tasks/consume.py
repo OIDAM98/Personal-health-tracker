@@ -5,11 +5,8 @@ import requests
 from typing import Optional
 from minio import Minio
 import io
-<<<<<<< HEAD
-=======
 from functools import reduce
 import pytz
->>>>>>> sleep-information
 from garminconnect import (
     Garmin,
     GarminConnectAuthenticationError,
@@ -55,8 +52,13 @@ def init_api(email: str,password: str) -> Garmin:
 
     return api
 
+def get_full_name(api: Garmin) -> dict:
+    name = { 'username': api.get_full_name() }
+    logger.info(format_json(name))
+    return name
+
 def get_overview_stats(api: Garmin, date: datetime.datetime) -> dict:
-    stats = api.get_stats(date.isoformat())
+    stats = api.get_stats_and_body(date.isoformat())
     logger.info(format_json(stats))
     return stats
 
@@ -70,92 +72,103 @@ def get_daily_activities(api: Garmin, date:datetime.datetime) -> dict:
     logger.info(format_json(activities))
     return activities
 
+
 def transform_overview_stats(data: dict) -> dict:
-    wanted_stats = [ 'totalKilocalories'
-            ,'activeKilocalories'
-            ,'totalDistanceMeters'
-            ,'dailyStepGoal'
-            ,'activeSeconds'
-            ,'sedentarySeconds'
-            ,'sleepingSeconds'
-            ,'floorsAscendedInMeters'
-            ,'floorsDescendedInMeters'
-            ,'intensityMinutesGoal'
-            ,'minHeartRate'
-            ,'maxHeartRate'
-            ,'restingHeartRate'
-            ,'maxStressLevel'
-            ,'averageStressLevel'
-            ,'totalSteps'
-            ,'sleepingSeconds'
-            ,'stressPercentage'
-            ,'bodyBatteryChargedValue'
-            ,'bodyBatteryDrainedValue'
-            ,'bodyBatteryHighestValue'
-            ,'bodyBatteryLowestValue'
-            ,'stressQualifier'
-        ]
-    stats = {stat: data[stat] for stat in wanted_stats}
+    overview_stats = [
+        'userProfileId'
+        , 'totalKilocalories'
+        , 'activeKilocalories'
+        , 'bmrKilocalories'
+        , 'wellnessKilocalories'
+        , 'totalSteps'
+        , 'totalDistanceMeters'
+        , 'wellnessDistanceMeters'
+        , 'wellnessActiveKilocalories'
+        , 'dailyStepGoal'
+        , 'highlyActiveSeconds'
+        , 'activeSeconds'
+        , 'sedentarySeconds'
+        , 'sleepingSeconds'
+        , 'moderateIntensityMinutes'
+        , 'vigorousIntensityMinutes'
+        , 'floorsAscendedInMeters'
+        , 'floorsDescendedInMeters'
+        , 'intensityMinutesGoal'
+        , 'minHeartRate'
+        , 'maxHeartRate'
+        , 'restingHeartRate'
+        , 'maxStressLevel'
+        , 'averageStressLevel'
+        , 'maxStressLevel'
+        , 'stressDuration'
+        , 'restStressDuration'
+        , 'activityStressDuration'
+        , 'uncategorizedStressDuration'
+        , 'totalStressDuration'
+        , 'lowStressDuration'
+        , 'mediumStressDuration'
+        , 'highStressDuration'
+        , 'sleepingSeconds'
+        , 'stressQualifier'
+        , 'bodyBatteryChargedValue'
+        , 'bodyBatteryDrainedValue'
+        , 'bodyBatteryHighestValue'
+        , 'bodyBatteryLowestValue'
+        , 'averageSpo2'
+        , 'lowestSpo2'
+        , 'avgWakingRespirationValue'
+        , 'highestRespirationValue'
+        , 'lowestRespirationValue'
+        , 'weight'
+        , 'bmi'
+        , 'metabolicAge'
+    ]
+    stats = {stat: data[stat] for stat in overview_stats}
     logger.info(format_json(stats))
     return stats
 
 def transform_daily_activities(data: dict) -> dict:
-    wanted_stats = [
+    exercise_stats = [
         'activityName'
-        ,'sportTypeId'
-        ,'startTimeLocal'
-        ,'activityType'
-        ,'distance'
-        ,'duration'
-        ,'elapsedDuration'
-        ,'movingDuration'
-        ,'averageSpeed'
-        ,'maxSpeed'
-        ,'calories'
-        ,'bmrCalories'
-        ,'averageHR'
-        ,'maxHR'
-        ,'steps'
-        ,'strokes'
-        ,'waterEstimated'
-        ,'averageRunningCadenceInStepsPerMinute'
-        ,'maxRunningCadenceInStepsPerMinute'
-        ,'averageSwimCadenceInStrokesPerMinute'
-        ,'maxSwimCadenceInStrokesPerMinute'
+        , 'ownerId'
+        , 'sportTypeId'
+        , 'startTimeLocal'
+        , 'activityType'
+        , 'distance'
+        , 'duration'
+        , 'elapsedDuration'
+        , 'movingDuration'
+        , 'averageSpeed'
+        , 'maxSpeed'
+        , 'calories'
+        , 'bmrCalories'
+        , 'averageHR'
+        , 'maxHR'
+        , 'steps'
+        , 'strokes'
+        , 'waterEstimated'
+        , 'averageRunningCadenceInStepsPerMinute'
+        , 'maxRunningCadenceInStepsPerMinute'
+        , 'averageSwimCadenceInStrokesPerMinute'
+        , 'maxSwimCadenceInStrokesPerMinute'
+        , 'averageSwolf'
+        , 'activeLengths'
+        , 'poolLength'
+        , 'avgStrokes'
+        , 'minStrokes'
+        , 'moderateIntensityMinutes'
+        , 'vigorousIntensityMinutes'
     ]
     stats = { 'activities':
-                         [{stat: activity[stat] for stat in wanted_stats} for activity in data]
+                         [{stat: activity[stat] for stat in exercise_stats} for activity in data]
                         }
+    for stat in stats['activities']:
+        act_type = stat['activityType']
+        stat['typeId'] = act_type['typeId']
+        stat['typeKey'] = act_type['typeKey']
+        del stat['activityType']
 
-    logger.info(format_json(stats))
-    return stats
 
-def transform_overview_stats(data: dict) -> dict:
-    wanted_stats = [ 'totalKilocalories'
-            ,'activeKilocalories'
-            ,'totalDistanceMeters'
-            ,'dailyStepGoal'
-            ,'activeSeconds'
-            ,'sedentarySeconds'
-            ,'sleepingSeconds'
-            ,'floorsAscendedInMeters'
-            ,'floorsDescendedInMeters'
-            ,'intensityMinutesGoal'
-            ,'minHeartRate'
-            ,'maxHeartRate'
-            ,'restingHeartRate'
-            ,'maxStressLevel'
-            ,'averageStressLevel'
-            ,'totalSteps'
-            ,'sleepingSeconds'
-            ,'stressPercentage'
-            ,'bodyBatteryChargedValue'
-            ,'bodyBatteryDrainedValue'
-            ,'bodyBatteryHighestValue'
-            ,'bodyBatteryLowestValue'
-            ,'stressQualifier'
-        ]
-    stats = {stat: data[stat] for stat in wanted_stats}
     logger.info(format_json(stats))
     return stats
 
@@ -172,7 +185,8 @@ def transform_sleep_stats(data: dict) -> dict:
     restless_key = 'restlessMomentsCount'
     sleep_key = 'dailySleepDTO'
     wanted_sleep_stats = [
-        'sleepTimeSeconds'
+        'userProfilePK'
+        , 'sleepTimeSeconds'
         , 'napTimeSeconds'
         , 'unmeasurableSleepSeconds'
         , 'deepSleepSeconds'
@@ -186,6 +200,7 @@ def transform_sleep_stats(data: dict) -> dict:
         , 'averageRespirationValue'
         , 'lowestRespirationValue'
         , 'highestRespirationValue'
+        , 'awakeCount'
         , 'avgSleepStress'
         , 'ageGroup'
         , 'sleepScoreFeedback'
@@ -194,16 +209,23 @@ def transform_sleep_stats(data: dict) -> dict:
     ]
 
     def timestamp_to_datetime(stamp: str) -> datetime.datetime:
+        if stamp is None:
+            return None
         dt = (datetime.datetime.utcfromtimestamp(stamp / 1000))
-        return pytz.utc.localize(dt, is_dst=None).astimezone(pytz.timezone('America/Mexico_City'))
+        return str(pytz.utc.localize(dt, is_dst=None).astimezone(pytz.timezone('America/Mexico_City')))
 
     stats = dict([(stat,data[stat]) for stat in data.keys() if stat not in unwanted_stats])
-    wellness_stats = {stat: stats[sleep_key][stat] for stat in wanted_sleep_stats }
-    restless_stats = {restless_key: stats[restless_key]}
-    wellness_stats['sleepStartDatetime'] = str(timestamp_to_datetime(wellness_stats['sleepStartTimestampGMT']))
-    wellness_stats['sleepEndDatetime'] = str(timestamp_to_datetime(wellness_stats['sleepEndTimestampGMT']))
-    del wellness_stats['sleepStartTimestampGMT']
-    del wellness_stats['sleepEndTimestampGMT']
+    logger.info(stats[sleep_key].keys())
+    wellness_stats = dict([ (stat,stats[sleep_key][stat]) for stat in wanted_sleep_stats if stat in stats[sleep_key].keys() ])
+    if restless_key in stats:
+        restless_stats = {restless_key: stats[restless_key]}
+    else:
+        restless_stats= { restless_key: None }
+    if 'sleepStartTimestampGMT' in wellness_stats and 'sleepEndTimestampGMT' in wellness_stats:
+        wellness_stats['sleepStartDatetime'] = timestamp_to_datetime(wellness_stats['sleepStartTimestampGMT'])
+        wellness_stats['sleepEndDatetime'] = timestamp_to_datetime(wellness_stats['sleepEndTimestampGMT'])
+        del wellness_stats['sleepStartTimestampGMT']
+        del wellness_stats['sleepEndTimestampGMT']
     sleep_stats = wellness_stats |  restless_stats
 
     logger.info(format_json(sleep_stats))
@@ -214,20 +236,16 @@ def prepare_json(*data) -> dict:
     logger.info(format_json(concat))
     return concat
 
-<<<<<<< HEAD
-def save_json(data: dict, date: datetime.datetime, con:Optional[Minio], bucket:str="") -> None:
-=======
-def save_json(data: dict, date: datetime.datetime, con:Optional[Minio]=None, bucket:str="") -> None:
->>>>>>> sleep-information
+def save_json(data: dict, date: datetime.datetime, filename: str, con:Optional[Minio]=None, bucket:str="") -> None:
     data = json.dumps(data, separators=(',', ':'))
     if con is None:
-        filename = f"{date.isoformat()}_overview.json"
-        with open(filename, 'w') as f:
+        f_name = f"{date.isoformat()}_{filename}.json"
+        with open(f_name, 'w') as f:
             json.dump(data, f, separators=(',',':'))
         logger.info(f"Saved data to {filename}")
     else:
         try:
-            path = f"/garmin/{date}/overview.json"
+            path = f"/garmin/{date}/{filename}.json"
             con.put_object(
                 bucket,
                 path,
