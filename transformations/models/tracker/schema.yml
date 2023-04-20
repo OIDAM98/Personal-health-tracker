@@ -1,0 +1,155 @@
+version: 2
+
+models:
+  - name: transformations
+    description: Health tracking schema
+    tables:
+      - name: users
+        columns:
+          - name: id
+            description: Identifier of a User
+            tests:
+              - unique
+              - not_null
+          - name: name
+            description: Full Name of a User
+
+      - name: activities
+        columns:
+          - name: id
+            description: Identifier of an Activity
+            tests:
+              - unique
+              - not_null
+          - name: key
+          - name: name
+            description: Name of an Activity
+            tests:
+              - unique
+              - not_null
+
+      - name: overview_facts
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: created_on
+            tests:
+              - unique
+              - not_null
+          - name: user_id
+          - name: total_kilocalories
+          - name: active_kilocalories
+          - name: bmr_kilocalories
+          - name: wellness_kilocalories
+          - name: total_steps
+          - name: total_distance_meters
+          - name: wellness_distance_meters
+          - name: wellness_active_kilocalories
+          - name: daily_step_goal
+          - name: highly_active_seconds
+          - name: active_seconds
+          - name: sedentary_seconds
+          - name: sleeping_seconds
+          - name: moderate_intensity_minutes
+          - name: vigorous_intensity_minutes
+          - name: floors_ascended_in_meters
+          - name: floors_descended_in_meters
+          - name: intensity_minutes_goal
+          - name: min_heart_rate
+          - name: max_heart_rate
+          - name: resting_heart_rate
+          - name: max_stress_level
+          - name: average_stress_level
+          - name: stress_duration
+          - name: rest_stress_duration
+          - name: activity_stress_duration
+          - name: uncategorized_stress_duration
+          - name: total_stress_duration
+          - name: low_stress_duration
+          - name: medium_stress_duration
+          - name: high_stress_duration
+          - name: stress_qualifier
+          - name: body_battery_charged_value
+          - name: body_battery_drained_value
+          - name: body_battery_highest_value
+          - name: body_battery_lowest_value
+          - name: average_spo2
+          - name: lowest_spo2
+          - name: avg_waking_respiration_value
+          - name: highest_respiration_value
+          - name: lowest_respiration_value
+          - name: weight
+          - name: bmi
+          - name: metabolic_age
+
+      - name: sleep_facts
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: created_on
+            tests:
+              - unique
+              - not_null
+          - name: user_id
+          - name: sleep_time_seconds
+          - name: nap_time_seconds
+          - name: unmeasurable_sleep_seconds
+          - name: deep_sleep_seconds
+          - name: light_sleep_seconds
+          - name: rem_sleep_seconds
+          - name: awake_sleep_seconds
+          - name: average_sp_o2_value
+          - name: lowest_sp_o2_value
+          - name: highest_sp_o2_value
+          - name: average_sp_o2_h_r_sleep
+          - name: average_respiration_value
+          - name: lowest_respiration_value
+          - name: highest_respiration_value
+          - name: awake_count
+          - name: avg_sleep_stress
+          - name: age_group
+          - name: sleep_score_feedback
+          - name: sleep_start_datetime
+          - name: sleep_end_datetime
+          - name: restless_moments_count
+
+      - name: activities_facts
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: user_id
+          - name: sport_id
+          - name: start_time_local
+            tests:
+              - unique
+              - not_null
+          - name: distance
+          - name: duration
+          - name: elapsed_duration
+          - name: moving_duration
+          - name: average_speed
+          - name: max_speed
+          - name: calories
+          - name: bmr_calories
+          - name: average_h_r
+          - name: max_h_r
+          - name: steps
+          - name: strokes
+          - name: water_estimated
+          - name: average_running_cadence_in_steps_per_minute
+          - name: max_running_cadence_in_steps_per_minute
+          - name: average_swim_cadence_in_strokes_per_minute
+          - name: max_swim_cadence_in_strokes_per_minute
+          - name: average_swolf
+          - name: active_lengths
+          - name: pool_length
+          - name: avg_strokes
+          - name: min_strokes
+          - name: moderate_intensity_minutes
+          - name: vigorous_intensity_minutes
