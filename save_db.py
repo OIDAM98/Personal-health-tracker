@@ -61,5 +61,6 @@ if __name__=='__main__':
         , host=dwh_host
         , database=dwh_database
         , password=dwh_password
+        , port=5430
     )
     save_to_db(dwh_url, to_add)

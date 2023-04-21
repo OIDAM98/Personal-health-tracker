@@ -18,7 +18,7 @@ services:
     env_file:
       - dbt.env
     ports:
-      - '5432:5432'
+      - '5430:5432'
     volumes:
       - /mnt/ext/dwh/psql:/var/lib/postgresql/data
 
@@ -128,3 +128,7 @@ services:
   #     - router
   #   env_file:
   #     - druid.env
+
+networks:
+  default:
+    name: internal
