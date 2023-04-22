@@ -1,3 +1,8 @@
+{{
+config(
+    materialization='view'
+)
+}}
 select
     ov.user_id as user_id
     , u.name as user_name

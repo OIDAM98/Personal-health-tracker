@@ -1,10 +1,3 @@
-{{
-config(
- materialized='incremental',
- unique_key='id'
-)
-}}
-
 select
        id
        , timestamp as created_on
@@ -54,9 +47,3 @@ select
        , bmi
        , metabolic_age
     FROM public.raw_overview_facts
-
-{% if is_incremental() %}
-
-   where timestamp >= (select max(timestamp) from public.raw_overview_facts)
-
-{% endif %}

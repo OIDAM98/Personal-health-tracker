@@ -1,10 +1,3 @@
-{{
-config(
- materialized='incremental',
- unique_key='id'
-)
-}}
-
 select
     id
     , timestamp as created_on
@@ -31,9 +24,3 @@ select
     , sleep_end_datetime
     , restless_moments_count
 from public.raw_sleep_facts
-
-{% if is_incremental() %}
-
-   where timestamp >= (select max(timestamp) from public.raw_sleep_facts)
-
-{% endif %}

@@ -1,11 +1,3 @@
-{{
-config(
- materialized='incremental',
- unique_key='id'
-)
-}}
-
-
 select
     id
     , owner_id as user_id
@@ -36,9 +28,3 @@ select
     , moderate_intensity_minutes
     , vigorous_intensity_minutes
 from public.raw_activities_facts
-
-{% if is_incremental() %}
-
-   where start_time_local >= (select max(start_time_local) from public.raw_activities_facts)
-
-{% endif %}
