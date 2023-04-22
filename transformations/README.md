@@ -6,10 +6,51 @@ Try running the following commands:
 - dbt run
 - dbt test
 
+### Using the Profiles YAML
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+Copy the `profiles-tmpl.yml` file into `~/.dbt/profiles.yml` for DBT to have information regarding the connections of this project.
+
+You could also include this into `~/.dbt/profiles.yml`
+
+``` yaml
+healttracker:
+  outputs:
+
+    dev:
+      type: postgres
+      threads: 1
+      host: ${HOST}
+      port: ${PORT}
+      user: ${USER}
+      pass: ${PASSWORD}
+      dbname: healthtracker
+      schema: bronze
+
+    prod:
+      type: postgres
+      threads: 1
+      host: ${HOST}
+      port: ${PORT}
+      user: ${USER}
+      pass: ${PASSWORD}
+      dbname: healthtracker
+      schema: prod
+
+  target: dev
+```
+
+In both cases, put the correct values into the placeholders.
+
+### Deployments
+
+Deployment for default environment (this case `dev`)
+
+``` sh
+dbt run
+```
+
+Deployment for production environment
+
+``` sh
+dbt run -t prod
+```

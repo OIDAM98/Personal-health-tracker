@@ -1,0 +1,24 @@
+healttracker:
+  outputs:
+
+    dev:
+      type: postgres
+      threads: 1
+      host: localhost
+      port: 5430
+      user: user
+      pass: s3cr3tp4ss
+      dbname: healthtracker
+      schema: bronze
+
+    prod:
+      type: postgres
+      threads: 1
+      host: localhost
+      port: 5430
+      user: user
+      pass: s3cr3tp4ss
+      dbname: healthtracker
+      schema: prod
+
+  target: dev
