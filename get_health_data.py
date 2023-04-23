@@ -33,7 +33,7 @@ if __name__=='__main__':
     minio_secret_key = os.getenv('MINIO_SECRET_KEY')
     bucket = os.getenv('BUCKET_NAME')
 
-    date_query = datetime.date.today() - datetime.timedelta(days=1)
+    date_query = datetime.date.today() - datetime.timedelta(days=2)
     logger.info(f"Getting data for: {date_query.isoformat()}")
     try:
         con =  Minio(

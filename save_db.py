@@ -32,7 +32,7 @@ if __name__=='__main__':
     dwh_database = os.getenv('DWH_DATABASE')
 
     api_type = 'garmin'
-    date_query = datetime.date.today() - datetime.timedelta(days=1)
+    date_query = datetime.date.today() - datetime.timedelta(days=2)
     date_query_dt = datetime.datetime.combine(date_query, datetime.datetime.min.time())
     logger.info(f"Getting data for: {date_query.isoformat()}")
 
