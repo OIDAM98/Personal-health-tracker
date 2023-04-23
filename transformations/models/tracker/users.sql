@@ -1,3 +1,8 @@
+{{
+config(
+    materialized='table'
+)
+}}
 select
     distinct user_profile_id as id
     , user_fullname as name

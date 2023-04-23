@@ -1,3 +1,8 @@
+{{
+config(
+    materialized='table'
+)
+}}
 select
     distinct sport_type_id as id
     , type_key as key
