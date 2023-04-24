@@ -213,6 +213,8 @@ There were some choices made at the beginning phase of this project that can be 
 
 Right now the only data source that is being collected is Garmin. This is a point to improve forward, to also enrich the dataset collected.
 
+Another point, proper testing is missing. Both in Python code and in DBT models.
+
 Another point, is to properly set up an orchestration tool,  in order to properly schedule and control both ETL and ELT process. Some tools suited are: 
 
 - [Dagster](https://dagster.io/).
