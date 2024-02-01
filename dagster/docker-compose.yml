@@ -1,0 +1,74 @@
+version: "3.7"
+
+services:
+  # This service runs the postgres DB used by dagster for run storage, schedule storage,
+  # and event log storage.
+  dagster_postgres:
+    image: postgres:11
+    container_name: dagster_postgres
+    env_file: code.env
+
+  # This service runs the gRPC server that loads your user code, in both dagit
+  # and dagster-daemon. By setting DAGSTER_CURRENT_IMAGE to its own image, we tell the
+  # run launcher to use this same image when launching runs in a new container as well.
+  # Multiple containers like this can be deployed separately - each just needs to run on
+  # its own port, and have its own entry in the workspace.yaml file that's loaded by dagit.
+  dagster_code:
+    build:
+      context: .
+      dockerfile: code.dockerfile
+    container_name: dagster_code
+    image: dagster_code
+    env_file: code.env
+#    restart: unless-stopped
+
+  # This service runs dagit, which loads your user code from the user code container.
+  # Since our instance uses the QueuedRunCoordinator, any runs submitted from dagit will be put on
+  # a queue and later dequeued and launched by dagster-daemon.
+  dagit:
+    build:
+      context: .
+      dockerfile: dagit.dockerfile
+    entrypoint:
+      - dagit
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    container_name: dagster_dagit
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    env_file: code.env
+    volumes: # Make docker client accessible so we can terminate containers from dagit
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/ext/dagster/io_manager_storage:/tmp/io_manager_storage
+    depends_on:
+      - dagster_postgres
+      - dagster_code
+
+  # This service runs the dagster-daemon process, which is responsible for taking runs
+  # off of the queue and launching them, as well as creating runs from schedules or sensors.
+  dagster_daemon:
+    build:
+      context: .
+      dockerfile: dagit.dockerfile
+    entrypoint:
+      - dagster-daemon
+      - run
+    container_name: dagster_daemon
+    restart: on-failure
+    env_file: code.env
+    volumes: # Make docker client accessible so we can launch containers using host docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/ext/dagster/io_manager_storage:/tmp/io_manager_storage
+    depends_on:
+      - dagster_postgres
+      - dagster_code
+
+networks:
+  default:
+    name: internal

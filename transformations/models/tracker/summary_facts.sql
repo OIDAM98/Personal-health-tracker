@@ -5,7 +5,8 @@ select
     , ov.total_kilocalories
     , ov.total_steps
     , ov.daily_step_goal
-    , ov.total_stress_duration
+    -- , ROUND(ov.total_stress_duration::NUMERIC / 60.00, 2) as total_stress_minutes
+    , ov.total_stress_duration as total_stress_minutes
     , ov.stress_qualifier
     , ov.average_spo2
     , ROUND(CAST(ov.weight as numeric) / 1000.00, 2) weight_kg

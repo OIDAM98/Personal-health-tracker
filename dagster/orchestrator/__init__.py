@@ -1,9 +1,9 @@
 from dagster import Definitions, load_assets_from_modules, define_asset_job, ScheduleDefinition
 
-from .garmin_consumer import assets as garmin_assets
-from .resources.garmin_client import GarminResource
-from .resources.minio_client import MinioResource
-from .elt import assets
+from orchestrator.garmin_consumer import assets as garmin_assets
+from orchestrator.resources.garmin_client import GarminResource
+from orchestrator.resources.minio_client import MinioResource
+from orchestrator.elt import assets
 from sqlalchemy.engine import URL
 import os
 
@@ -41,7 +41,7 @@ url = URL.create(
     , host=dwh_host
     , database=dwh_database
     , password=dwh_password
-    , port=5430
+    , port=5432
 )
 
 elt_job = define_asset_job(
